@@ -41,7 +41,7 @@ module Fastlane
 
       def self.download_bundletool(version)
         puts_message("Downloading bundletool (#{version}) from https://github.com/google/bundletool/releases/download/#{version}/bundletool-all-#{version}.jar...")
-        Dir.mkdir "#{@project_root}/bundletool_temp"        
+        Dir.mkdir "#{@project_root}/bundletool_temp"
         URI.open("https://github.com/google/bundletool/releases/download/#{version}/bundletool-all-#{version}.jar") do |bundletool|
           File.open("#{@bundletool_temp_path}/bundletool.jar", 'wb') do |file|
             file.write(bundletool.read)
@@ -50,7 +50,7 @@ module Fastlane
         puts_success('Downloading bundletool')
       rescue OpenURI::HTTPError => e
         clean_temp!
-        puts_error!("Something went wrong when downloading bundletool version #{version}. \nError message\n #{e.message}")        
+        puts_error!("Something went wrong when downloading bundletool version #{version}. \nError message\n #{e.message}")
         false
       end
 
@@ -74,7 +74,7 @@ module Fastlane
           keystore_params = "--ks='#{keystore_info[:keystore_path]}' --ks-pass='pass:#{keystore_info[:keystore_password]}' --ks-key-alias='#{keystore_info[:alias]}' --key-pass='pass:#{keystore_info[:alias_password]}'"
         end
 
-        cmd = "java -jar #{@bundletool_temp_path}/bundletool.jar build-apks --bundle=\"#{aab_path}\" --output=\"#{output_path}\" --mode=universal #{keystore_params}"
+        cmd = "java -jar #{@bundletool_temp_path}/bundletool.jar build-apks --bundle=\"#{aab_path}\" --output=\"#{output_path}\" --local-testing #{keystore_params}"
 
         Open3.popen3(cmd) do |_, _, stderr, wait_thr|
           exit_status = wait_thr.value
@@ -94,9 +94,7 @@ module Fastlane
           puts_important("Creating path #{target_dir_name} since does not exist")
           FileUtils.mkdir_p target_dir_name
         end
-        cmd = "mv \"#{output_path}\" \"#{@bundletool_temp_path}/output.zip\" &&
-        unzip \"#{@bundletool_temp_path}/output.zip\" -d \"#{@bundletool_temp_path}\" &&
-        mv \"#{@bundletool_temp_path}/universal.apk\" \"#{target_path}\""
+        cmd = "mv \"#{output_path}\" \"#{target_path}\""
         Open3.popen3(cmd) do |_, _, stderr, wait_thr|
           exit_status = wait_thr.value
           raise stderr.read unless exit_status.success?
@@ -160,10 +158,10 @@ module Fastlane
                                        is_string: true,
                                        optional: false,
                                        verify_block: proc do |value|
-                                                       unless value && !value.empty?
-                                                         UI.user_error!('You must set aab_path.')
-                                                       end
-                                                     end),
+                                         unless value && !value.empty?
+                                           UI.user_error!('You must set aab_path.')
+                                         end
+                                       end),
           FastlaneCore::ConfigItem.new(key: :apk_output_path,
                                        description: 'Path where the apk file is going to be placed',
                                        is_string: true,
