@@ -34,7 +34,7 @@ bundletool(
   ks_password: keystore_password,
   ks_key_alias: keystore_alias,
   ks_key_alias_password: keystore_alias_password,
-  bundletool_version: '0.11.0',
+  bundletool_version: '1.9.0',
   aab_path: aab_path,
   apk_output_path: apk_output_path,
   verbose: true
